@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react"
 import "./App.css"
+import copy from "copy-to-clipboard"
 
 function App() {
   const [longUrl, setLongUrl] = useState("")
   const [urls, setUrls] = useState([])
+  const [popupOpen, PopupOpen] = useState(false)
 
   useEffect(() => {
     fetch("http://localhost:8080/")
       .then(res => res.json())
       .then(data => setUrls(data))
   }, [])
-
-  console.log(urls)
 
 
   function handleSubmit(e) {
@@ -26,12 +26,16 @@ function App() {
       .then(data => {
         console.log(data)
         setUrls([...urls, data.shortUrl])
+        copy("http://localhost:8080/" + data.shortUrl.short_url)
+        alert("Copied short link to clipboard")
       })
   }
 
   function handleClick(index) {
-    window.open("http://localhost:8080/" + urls[index].short_url)
+    window.open("http://localhost:8080/" + urls[index].short_url, "_blank")
   }
+
+  
 
 
   return (
@@ -47,15 +51,19 @@ function App() {
       </form>
       <div>
         {urls.map((url, index) => (
-          <div key={index} onClick={e => handleClick(index)}
-            className="urlListItem">
-            <a className="fullUrl">
-              {url.original_url}</a>
-            <a className="shortUrl">
-              {url.short_url}</a>
-          </div>
+          <a key={index} onClick={e => handleClick(index)}
+            className="urlListItem"
+            href={"http://localhost:8080/" + url.short_url}
+            target="_blank"
+          >
+            <p className="fullUrl">
+              {url.original_url}</p>
+            <p className="shortUrl">
+              {url.short_url}</p>
+          </a>
         ))}
       </div>
+
     </div>
 
   );
